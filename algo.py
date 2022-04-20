@@ -2,6 +2,7 @@ import json
 from pprint import pprint
 import requests
 
+base = "api/data/"
 vin = requests.get('https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVin/JTDKN3DU7B1398782?format=json&modelyear=2011').json()
 
 vin_det = {}
@@ -10,10 +11,11 @@ for r in vin['Results']:
     if r['Value'] is not None and r['Value'] != '' and r['Value'] != 'None':
         vin_det[r['Variable']] = {'id': r['VariableId'], 'value': r['Value']}
 
-with open("adj_list.json") as file:
-    adj_dict = json.load(file)
 
-with open("edge_list.json") as file2:
+with open(f"{base}adj_list.json") as file:
+    adj_dict = json.load(file)
+    
+with open(f"{base}edge_list.json") as file2:
     edge_dict = json.load(file2)
 
 adj_list = []
@@ -23,97 +25,97 @@ for i in range(len(adj_dict)):
 edge_list = []
 for i in range(len(edge_dict)):
     edge_list.append(edge_dict[str(i)])
-with open("state_codes.json") as sc:
+with open(f"{base}state_codes.json") as sc:
     state_codes = json.load(sc)
 
-with open("state_rev.json") as sr:
+with open(f"{base}state_rev.json") as sr:
     state_rev = json.load(sr)
 
-with open("ctry_codes.json") as cc:
+with open(f"{base}ctry_codes.json") as cc:
     ctry_codes = json.load(cc)
 
-with open("ctry_rev.json") as cr:
+with open(f"{base}ctry_rev.json") as cr:
     ctry_rev = json.load(cr)
 
-with open("mfr_codes.json") as mc:
+with open(f"{base}mfr_codes.json") as mc:
     mfr_codes = json.load(mc)
 
-with open("mfr_rev.json") as mr:
+with open(f"{base}mfr_rev.json") as mr:
     mfr_rev = json.load(mr)
 
-with open("city_codes.json") as yc:
+with open(f"{base}city_codes.json") as yc:
     city_codes = json.load(yc)
 
-with open("city_rev.json") as yr:
+with open(f"{base}city_rev.json") as yr:
     city_rev = json.load(yr)
 
-with open("leader_codes.json") as lc:
+with open(f"{base}leader_codes.json") as lc:
     leader_codes = json.load(lc)
 
-with open("leader_rev.json") as lr:
+with open(f"{base}leader_rev.json") as lr:
     leader_rev = json.load(lr)
 
-with open("postal_codes.json") as pc:
+with open(f"{base}postal_codes.json") as pc:
     postal_codes = json.load(pc)
 
-with open("postal_code_rev.json") as pr:
+with open(f"{base}postal_code_rev.json") as pr:
     postal_rev = json.load(pr)
 
-with open("common_codes.json") as oc:
+with open(f"{base}common_codes.json") as oc:
     common_codes = json.load(oc)
 
-with open("common_rev.json") as o_r:
+with open(f"{base}common_rev.json") as o_r:
     common_rev = json.load(o_r)
 
-with open("link_codes.json") as ic:
+with open(f"{base}link_codes.json") as ic:
     link_codes = json.load(ic)
 
-with open("link_rev.json") as ir:
+with open(f"{base}link_rev.json") as ir:
     link_rev = json.load(ir)
 
-with open("make_codes.json") as ac:
+with open(f"{base}make_codes.json") as ac:
     make_codes = json.load(ac)
 
-with open("make_rev.json") as ar:
+with open(f"{base}make_rev.json") as ar:
     make_rev = json.load(ar)
 
-with open("model_codes.json") as dc:
+with open(f"{base}model_codes.json") as dc:
     model_codes = json.load(dc)
 
-with open("model_rev.json") as dr:
+with open(f"{base}model_rev.json") as dr:
     model_rev = json.load(dr)
 
-with open("type_codes.json") as tc:
+with open(f"{base}type_codes.json") as tc:
     type_codes = json.load(tc)
 
-with open("type_rev.json") as tr:
+with open(f"{base}type_rev.json") as tr:
     type_rev = json.load(tr)
 
-with open("code_master.json") as file3:
+with open(f"{base}code_master.json") as file3:
     master_codes = json.load(file3)
 
-with open("mfr_by_name.json") as nf:
+with open(f"{base}mfr_by_name.json") as nf:
     mfr_name = json.load(nf)
 
-with open("makes_by_name.json") as nf:
+with open(f"{base}makes_by_name.json") as nf:
     make_name = json.load(nf)
 
-with open("type_name.json") as nf:
+with open(f"{base}type_name.json") as nf:
     type_name = json.load(nf)
 
-with open("new_mfrs.json") as file:
+with open(f"{base}new_mfrs.json") as file:
     mfrs = json.load(file)
 
-with open("leaders.json") as file3:
+with open(f"{base}leaders.json") as file3:
     leaders = json.load(file3)
 
-with open("links.json") as file7:
+with open(f"{base}links.json") as file7:
     links = json.load(file7)
 
-with open("new_makes.json") as file5:
+with open(f"{base}new_makes.json") as file5:
     makes = json.load(file5)
 
-with open("new_models.json") as file2:
+with open(f"{base}new_models.json") as file2:
     models = json.load(file2)
 
 def get_mfrs_in_country(ctry):
@@ -349,7 +351,7 @@ pmod = vin_det['Model']['value']
 ptype = vin_det['Vehicle Type']['value']
 
 #
-def get_related(ctry, city, state, mfr_, make, type):
+def get_related(ctry, city, state, mfr_, make):
     relations = {}
     #Other manufacturers in the country
     if get_mfrs_in_country(ctry) is not None:
