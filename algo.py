@@ -334,7 +334,6 @@ def get_mfrs_with_same_common_as_(mfr):
         ms = []
         for c in commons:
             for m in adj_list[c]:
-                print(m)
                 ms.append(mfrs[mfr_codes[str(m)]]['name'])
 
         return ms
@@ -386,6 +385,7 @@ def get_related(ctry, city, state, mfr_, make, type):
         relations['leader'] = leaders[mfr_id]
     else:
         relations['leader'] = ''
+
     #Link to Vin Decoder
     if get_link_by_mfr(mfr_) is not None:
         link_code = get_link_by_mfr(mfr_)
@@ -393,7 +393,13 @@ def get_related(ctry, city, state, mfr_, make, type):
         relations['link'] = links[mfr_id]['URL']
     else:
         relations['link'] = ''
+
     #Manufacturers that share the common name
+    if get_mfrs_with_same_common_as_(mfr_) is not None:
+        relations['same_common_name'] = get_mfrs_with_same_common_as_(mfr_)
+    else:
+        relations['same_common_name'] = []
+
     #Other makes made by the manufacturer (Sibling makes)
     if get_makes_by_mfr(mfr_) is not None:
         names = []
@@ -403,11 +409,10 @@ def get_related(ctry, city, state, mfr_, make, type):
         relations['sister_makes'] = names
     else:
         relations['sister_makes'] = []
+
     #Other makes that make the type of vehicle that the make does
-    if get_mfrs_with_same_common_as_(mfr_) is not None:
-        relations['same_common_name'] = get_mfrs_with_same_common_as_(mfr_)
-    else:
-        relations['same_common_name'] = []
+
+
     #Models made by the make
     if get_models_by_make(make) is not None:
         names = []
@@ -419,7 +424,7 @@ def get_related(ctry, city, state, mfr_, make, type):
 
     return relations
 
-pprint(get_related(ctry=pctry, state=pstate, city=pcity, mfr_=pmfr, make=pmake, type=ptype))
+#pprint(get_related(ctry=pctry, state=pstate, city=pcity, mfr_=pmfr, make=pmake, type=ptype))
 
 
 
