@@ -196,8 +196,6 @@ if True:
         else:
             mcodes = None
 
-
-
         if ccode is not None and scode is not None:
             adj_list[ccode].add(scode)
             adj_list[int(mfr_rev[m])].add(ccode)
@@ -213,8 +211,8 @@ if True:
         elif ycode is not None:
             adj_list[int(mfr_rev[m])].add(ycode)
 
-        if ccode is not None and pcode is not None:
-            adj_list[ccode].add(pcode)
+        if ycode is not None and pcode is not None:
+            adj_list[ycode].add(pcode)
             adj_list[int(mfr_rev[m])].add(pcode)
         elif pcode is not None:
             adj_list[int(mfr_rev[m])].add(pcode)
@@ -228,6 +226,7 @@ if True:
         if lcode is not None and ocode is not None:
             adj_list[lcode].add(ocode)
             adj_list[int(mfr_rev[m])].add(ocode)
+            adj_list[ocode].add(int(mfr_rev[m]))
         elif ocode is not None:
             adj_list[int(mfr_rev[m])].add(ocode)
             adj_list[ocode].add(int(mfr_rev[m]))
@@ -275,7 +274,7 @@ for i in range(len(adj_list)):
 
     s = adj_list[i]
     row = []
-    
+
     for x in s:
         row.append(x)
 
