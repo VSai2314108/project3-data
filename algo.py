@@ -14,16 +14,9 @@ for r in vin['Results']:
     if r['Value'] is not None and r['Value'] != '' and r['Value'] != 'None':
         vin_det[r['Variable']] = {'id': r['VariableId'], 'value': r['Value']}
 
-<<<<<<< HEAD
-
-with open(f"{base}adj_list.json") as file:
-    adj_dict = json.load(file)
-    
-=======
 with open(f"{base}adj_list.json") as file:
     adj_dict = json.load(file)
 
->>>>>>> c5e0ae209485cbfb7af276dfd3be713eb5990495
 with open(f"{base}edge_list.json") as file2:
     edge_dict = json.load(file2)
 
@@ -419,16 +412,11 @@ pmake = vin_det['Make']['value']
 pmod = vin_det['Model']['value']
 ptype = vin_det['Vehicle Type']['value']
 
-<<<<<<< HEAD
-#
-def get_related(ctry, city, state, mfr_, make):
-=======
 #print(pctry, pcity, pstate, pmfr, pmake, pmod, ptype)
 
 def get_related_adj(ctry, city, state, mfr_, make, type_):
     start = time.time()
 
->>>>>>> c5e0ae209485cbfb7af276dfd3be713eb5990495
     relations = {}
     #Other manufacturers in the country
     if get_mfrs_in_country(ctry) is not None:
@@ -524,11 +512,12 @@ def get_related_adj(ctry, city, state, mfr_, make, type_):
     end = time.time()
 
     relations['elapsed_time'] = f"{(end-start)*1000} milliseconds"
+    relations['elapsed_time'] = [relations['elapsed_time']]
+    relations['leader'] = [relations['leader']]
+    relations['link'] = [relations['link']]
 
     return relations
 
 def get_related_edge(ctry, city, state, mfr_, make, type_):
     None
-
-pprint(get_related_adj(ctry=pctry, state=pstate, city=pcity, mfr_=pmfr, make=pmake, type_=ptype))
 
