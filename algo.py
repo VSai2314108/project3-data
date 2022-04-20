@@ -1,18 +1,14 @@
 import json
-from pprint import pprint
-import requests
 import time
 
-base = ""
-
 base = "api/data/"
-vin = requests.get('https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVin/JTDKN3DU7B1398782?format=json&modelyear=2011').json()
-
-vin_det = {}
-
-for r in vin['Results']:
-    if r['Value'] is not None and r['Value'] != '' and r['Value'] != 'None':
-        vin_det[r['Variable']] = {'id': r['VariableId'], 'value': r['Value']}
+#vin = requests.get('https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVin/JTDKN3DU7B1398782?format=json&modelyear=2011').json()
+#
+#vin_det = {}
+#
+#for r in vin['Results']:
+ #   if r['Value'] is not None and r['Value'] != '' and r['Value'] != 'None':
+  #      vin_det[r['Variable']] = {'id': r['VariableId'], 'value': r['Value']}
 
 with open(f"{base}adj_list.json") as file:
     adj_dict = json.load(file)
@@ -122,6 +118,8 @@ with open(f"{base}new_models.json") as file2:
 
 with open(f"{base}type_name_flipped.json") as file6:
     type_name_flipped = json.load(file6)
+
+##################### HELPER FUNCTIONS FOR ADJACENCY LIST TRAVERSAL ###############################
 
 def get_mfrs_in_country(ctry):
     if ctry_rev.get(ctry) is not None:
@@ -404,21 +402,13 @@ def get_makes_with_same_type(make):
     else:
         return tm
 
-pctry = vin_det['Plant Country']['value']
-pcity = vin_det['Plant City']['value']
-pstate = vin_det['Plant State']['value']
-pmfr = vin_det['Manufacturer Name']['value']
-pmake = vin_det['Make']['value']
-pmod = vin_det['Model']['value']
-ptype = vin_det['Vehicle Type']['value']
-
-#print(pctry, pcity, pstate, pmfr, pmake, pmod, ptype)
+#####################  ADJACENCY LIST TRAVERSAL ###############################
 
 def get_related_adj(ctry, city, state, mfr_, make, type_):
     start = time.time()
 
     relations = {}
-    #Other manufacturers in the country
+    # Other manufacturers in the country
     if get_mfrs_in_country(ctry) is not None:
         names = []
         for mfr in get_mfrs_in_country(ctry):
@@ -427,7 +417,7 @@ def get_related_adj(ctry, city, state, mfr_, make, type_):
     else:
         relations['mfrs_orig_from_ctry'] = []
 
-    #Other manufacturers in the state
+    # Other manufacturers in the state
     if get_mfrs_in_state(state) is not None:
         names = []
         for mfr in get_mfrs_in_state(state):
@@ -436,7 +426,7 @@ def get_related_adj(ctry, city, state, mfr_, make, type_):
     else:
         relations['mfrs_orig_from_state'] = []
 
-    #Other manufacturers in the city
+    # Other manufacturers in the city
     if get_mfrs_in_city(city) is not None:
         names = []
         for mfr in get_mfrs_in_city(city):
@@ -445,40 +435,40 @@ def get_related_adj(ctry, city, state, mfr_, make, type_):
     else:
         relations['mfrs_orig_from_city'] = []
 
-    #Other manufacturers in the postal
+    # Other manufacturers in the postal
     if get_postal_by_mfr(mfr_) is not None:
+        names = []
         postal = get_postal_by_mfr(mfr_)
         if get_mfrs_in_postal(postal):
-            names = []
             for mfr in get_mfrs_in_postal(postal):
                 names.append(mfrs[mfr_codes[str(mfr)]]['name'])
         relations['mfrs_orig_from_postal'] = names
     else:
         relations['mfrs_orig_from_postal'] = []
 
-        #Leader
+    # Leader
     if get_leader_by_mfr(mfr_) is not None:
         l_code = get_leader_by_mfr(mfr_)
         mfr_id = leader_codes[str(l_code)]
-        relations['leader'] = leaders[mfr_id]
+        relations['leader'] = [leaders[mfr_id]['name'], leaders[mfr_id]['pos']]
     else:
-        relations['leader'] = ''
+        relations['leader'] = []
 
-    #Link to Vin Decoder
+    # Link to Vin Decoder
     if get_link_by_mfr(mfr_) is not None:
         link_code = get_link_by_mfr(mfr_)
         mfr_id = link_codes[str(link_code)]
-        relations['link'] = links[mfr_id]['URL']
+        relations['link'] = [links[mfr_id]['URL']]
     else:
-        relations['link'] = ''
+        relations['link'] = []
 
-    #Manufacturers that share the common name
+    # Manufacturers that share the common name
     if get_mfrs_with_same_common_as_(mfr_) is not None:
         relations['same_common_name'] = get_mfrs_with_same_common_as_(mfr_)
     else:
         relations['same_common_name'] = []
 
-    #Other makes made by the manufacturer (Sibling makes)
+    # Other makes made by the manufacturer (Sibling makes)
     if get_makes_by_mfr(mfr_) is not None:
         names = []
         for mak in get_makes_by_mfr(mfr_):
@@ -488,13 +478,13 @@ def get_related_adj(ctry, city, state, mfr_, make, type_):
     else:
         relations['sister_makes'] = []
 
-    #Other makes that make the type of vehicle that the make does
+    # Types produced by make
     if get_types_by_make(make) is not None:
         relations['types_produced'] = get_types_by_make(make)
     else:
         relations['types_produced'] = []
 
-    #Models made by the make
+    # Models made by the make
     if get_models_by_make(make) is not None:
         names = []
         for mod in get_models_by_make(make):
@@ -502,12 +492,6 @@ def get_related_adj(ctry, city, state, mfr_, make, type_):
         relations['models'] = names
     else:
         relations['models'] = []
-
-    # Makes that produce the same types of cars
-    if get_makes_with_same_type(make) is None:
-        relations['other_man_types'] = {}
-    else:
-        relations['other_man_types'] = get_makes_with_same_type(make)
 
     end = time.time()
 
@@ -518,6 +502,184 @@ def get_related_adj(ctry, city, state, mfr_, make, type_):
 
     return relations
 
+#####################  EDGE LIST TRAVERSAL ###############################
+
 def get_related_edge(ctry, city, state, mfr_, make, type_):
-    None
+
+    start = time.time()
+
+    relations = {}
+
+    # Other manufacturers in the country
+    if ctry_rev.get(ctry) is not None:
+        adj_ctry = []
+        country = ctry_rev[ctry]
+
+        for edge in edge_list:
+            if edge[1] == int(country):
+                adj_ctry.append(mfrs[mfr_codes[str(edge[0])]]['name'])
+
+        relations['mfrs_orig_from_ctry'] = adj_ctry
+    else:
+        relations['mfrs_orig_from_ctry'] = []
+
+    # Other manufacturers in the city
+    if city_rev.get(city) is not None:
+        adj_city = []
+        city = city_rev[city]
+
+        for edge in edge_list:
+            if edge[1] == int(city):
+                adj_city.append(mfrs[mfr_codes[str(edge[0])]]['name'])
+
+        relations['mfrs_orig_from_city'] = adj_city
+    else:
+        relations['mfrs_orig_from_city'] = []
+
+    # Other manufacturers in the state
+    if state_rev.get(state) is not None:
+        adj_state = []
+        state_ = state_rev[state]
+
+        for edge in edge_list:
+            if edge[1] == int(state_):
+                adj_state.append(mfrs[mfr_codes[str(edge[0])]]['name'])
+
+        relations['mfrs_orig_from_state'] = adj_state
+    else:
+        relations['mfrs_orig_from_state'] = []
+
+    # Other manufacturers in the postal
+    if get_postal_by_mfr(mfr_) is not None:
+        adj_postal = []
+        postal = get_postal_by_mfr(mfr_)
+
+        for edge in edge_list:
+            if edge[1] == postal:
+                if 31258 <= edge[0] <= 50257:
+                    adj_postal.append(mfrs[mfr_codes[str(edge[0])]]['name'])
+
+        relations['mfrs_orig_from_postal'] = adj_postal
+    else:
+        relations['mfrs_orig_from_postal'] = []
+
+    # Leader
+    if get_leader_by_mfr(mfr_) is not None:
+        leader = get_leader_by_mfr(mfr_)
+
+        for edge in edge_list:
+            if edge[0] == int(mfr_rev[mfr_name[mfr_]]):
+                if edge[1] == leader:
+                    l = leader_codes[str(edge[1])]
+                    leader = leaders[l]
+
+        relations['leader'] = [leader['name'], leader['pos']]
+    else:
+        relations['leader'] = []
+
+    # Link to Vin Decoder
+    if mfr_name.get(mfr_):
+        link = ''
+
+        for edge in edge_list:
+            if edge[0] == int(mfr_rev[mfr_name[mfr_]]):
+                if 85523 <= edge[1] <= 93961:
+                    link = links[str(link_codes[str(edge[1])])]["URL"]
+
+        relations['link'] = [link]
+    else:
+        relations['link'] = []
+
+    # Manufacturers that share the common name
+    if mfr_name.get(mfr_) is not None:
+        common = mfrs[mfr_name[mfr_]]['common']
+        ccode = common_rev[common]
+
+        mans = []
+
+        for edge in edge_list:
+            if edge[0] == int(ccode):
+                mans.append(mfrs[mfr_codes[str(edge[1])]]['name'])
+
+        relations['same_common_name'] = mans
+    else:
+        relations['same_common_name'] = []
+
+
+    # Other makes made by the manufacturer (Sibling makes)
+    if make_name.get(make) is not None:
+        mcode = make_rev[make_name[make]]
+        mfrcode = mfr_rev[mfr_name[mfr_]]
+
+        sis = []
+
+        for edge in edge_list:
+            if edge[0] == int(mfrcode):
+                if 50258 <= edge[1] <= 60400 and edge[1] != int(mcode):
+                    sis.append(makes[str(make_codes[str(edge[1])])])
+
+        relations['sister_makes'] = sis
+    else:
+        relations['sister_makes'] = []
+
+    # Types made by make
+    if make_name.get(make) is not None:
+        mcode = make_rev[make_name[make]]
+
+        mods = []
+
+        for edge in edge_list:
+            if edge[0] == int(mcode):
+                if 93961 <= edge[1] <= 93969:
+                    mods.append(type_name_flipped[str(type_codes[str(edge[1])])])
+
+        relations['types'] = mods
+    else:
+        relations['types'] = []
+
+
+    # Models made by the make
+    if make_name.get(make) is not None:
+        mcode = make_rev[make_name[make]]
+
+        mods = []
+
+        for edge in edge_list:
+            if edge[0] == int(mcode):
+                if 60401 <= edge[1] <= 85522:
+                    mods.append(models[model_codes[str(edge[1])]]['model'])
+
+        relations['models'] = mods
+    else:
+        relations['models'] = []
+
+    end = time.time()
+
+    relations['elapsed_time'] = [f"{(end - start) * 1000} milliseconds"]
+    relations['leader'] = [relations['leader']]
+    relations['link'] = [relations['link']]
+
+    return relations
+
+# ============== EXAMPLES FOR TESTING ==================
+
+#vin = requests.get('https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVin/JTDKN3DU7B1398782?format=json&modelyear=2011').json()
+
+#vin_det = {}
+
+#for r in vin['Results']:
+    #if r['Value'] is not None and r['Value'] != '' and r['Value'] != 'None':
+        #vin_det[r['Variable']] = {'id': r['VariableId'], 'value': r['Value']}
+
+
+#pctry = vin_det['Plant Country']['value']
+#pcity = vin_det['Plant City']['value']
+#pstate = vin_det['Plant State']['value']
+#pmfr = vin_det['Manufacturer Name']['value']
+#pmake = vin_det['Make']['value']
+#pmod = vin_det['Model']['value']
+#ptype = vin_det['Vehicle Type']['value']
+
+#pprint(get_related_adj(ctry=pctry, state=pstate, city=pcity, mfr_="TESLA, INC.", make=pmake, type_=ptype))
+#pprint(get_related_edge(ctry=pctry, state=pstate, city=pcity, mfr_="TESLA, INC.", make=pmake, type_=ptype))
 
