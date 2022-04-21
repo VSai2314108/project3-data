@@ -413,27 +413,27 @@ def get_related_adj(ctry, city, state, mfr_, make, type_):
         names = []
         for mfr in get_mfrs_in_country(ctry):
             names.append(mfrs[mfr_codes[str(mfr)]]['name'])
-        relations['mfrs_orig_from_ctry'] = names
+        relations['Manufacturers from Country'] = names
     else:
-        relations['mfrs_orig_from_ctry'] = []
+        relations['Manufacturers from Country'] = []
 
     # Other manufacturers in the state
     if get_mfrs_in_state(state) is not None:
         names = []
         for mfr in get_mfrs_in_state(state):
             names.append(mfrs[mfr_codes[str(mfr)]]['name'])
-        relations['mfrs_orig_from_state'] = names
+        relations['Manufacturers from State'] = names
     else:
-        relations['mfrs_orig_from_state'] = []
+        relations['Manufacturers from State'] = []
 
     # Other manufacturers in the city
     if get_mfrs_in_city(city) is not None:
         names = []
         for mfr in get_mfrs_in_city(city):
             names.append(mfrs[mfr_codes[str(mfr)]]['name'])
-        relations['mfrs_orig_from_city'] = names
+        relations['Manufacturers from City'] = names
     else:
-        relations['mfrs_orig_from_city'] = []
+        relations['Manufacturers from City'] = []
 
     # Other manufacturers in the postal
     if get_postal_by_mfr(mfr_) is not None:
@@ -442,31 +442,31 @@ def get_related_adj(ctry, city, state, mfr_, make, type_):
         if get_mfrs_in_postal(postal):
             for mfr in get_mfrs_in_postal(postal):
                 names.append(mfrs[mfr_codes[str(mfr)]]['name'])
-        relations['mfrs_orig_from_postal'] = names
+        relations['Manufacturers from Zip Code'] = names
     else:
-        relations['mfrs_orig_from_postal'] = []
+        relations['Manufacturers from Zip Code'] = []
 
     # Leader
     if get_leader_by_mfr(mfr_) is not None:
         l_code = get_leader_by_mfr(mfr_)
         mfr_id = leader_codes[str(l_code)]
-        relations['leader'] = [leaders[mfr_id]['name'], leaders[mfr_id]['pos']]
+        relations['Leaders'] = [leaders[mfr_id]['name'], leaders[mfr_id]['pos']]
     else:
-        relations['leader'] = []
+        relations['Leaders'] = []
 
     # Link to Vin Decoder
     if get_link_by_mfr(mfr_) is not None:
         link_code = get_link_by_mfr(mfr_)
         mfr_id = link_codes[str(link_code)]
-        relations['link'] = [links[mfr_id]['URL']]
+        relations['Website'] = [links[mfr_id]['URL']]
     else:
-        relations['link'] = []
+        relations['Website'] = []
 
     # Manufacturers that share the common name
     if get_mfrs_with_same_common_as_(mfr_) is not None:
-        relations['same_common_name'] = get_mfrs_with_same_common_as_(mfr_)
+        relations['Same Name'] = get_mfrs_with_same_common_as_(mfr_)
     else:
-        relations['same_common_name'] = []
+        relations['Same Name'] = []
 
     # Other makes made by the manufacturer (Sibling makes)
     if get_makes_by_mfr(mfr_) is not None:
@@ -474,31 +474,31 @@ def get_related_adj(ctry, city, state, mfr_, make, type_):
         for mak in get_makes_by_mfr(mfr_):
             if makes[make_codes[str(mak)]] != make:
                 names.append(makes[make_codes[str(mak)]])
-        relations['sister_makes'] = names
+        relations['Sister Makes'] = names
     else:
-        relations['sister_makes'] = []
+        relations['Sister Makes'] = []
 
     # Types produced by make
     if get_types_by_make(make) is not None:
-        relations['types_produced'] = get_types_by_make(make)
+        relations['Types Produced'] = get_types_by_make(make)
     else:
-        relations['types_produced'] = []
+        relations['Types Produced'] = []
 
     # Models made by the make
     if get_models_by_make(make) is not None:
         names = []
         for mod in get_models_by_make(make):
             names.append(models[model_codes[str(mod)]]['model'])
-        relations['models'] = names
+        relations['Models'] = names
     else:
-        relations['models'] = []
+        relations['Modles'] = []
 
     end = time.time()
 
-    relations['elapsed_time'] = f"{(end-start)*1000} milliseconds"
-    relations['elapsed_time'] = [relations['elapsed_time']]
-    relations['leader'] = [relations['leader']]
-    relations['link'] = [relations['link']]
+    relations['Elapsed Time'] = f"{(end-start)*1000} milliseconds"
+    relations['Elapsed Time'] = [relations['Elapsed Time']]
+    relations['Leaders'] = [relations['Leaders']]
+    relations['Website'] = [relations['Website']]
 
     return relations
 
@@ -519,9 +519,9 @@ def get_related_edge(ctry, city, state, mfr_, make, type_):
             if edge[1] == int(country):
                 adj_ctry.append(mfrs[mfr_codes[str(edge[0])]]['name'])
 
-        relations['mfrs_orig_from_ctry'] = adj_ctry
+        relations['Manufacturers from Country'] = adj_ctry
     else:
-        relations['mfrs_orig_from_ctry'] = []
+        relations['Manufacturers from Country'] = []
 
     # Other manufacturers in the city
     if city_rev.get(city) is not None:
@@ -532,9 +532,9 @@ def get_related_edge(ctry, city, state, mfr_, make, type_):
             if edge[1] == int(city):
                 adj_city.append(mfrs[mfr_codes[str(edge[0])]]['name'])
 
-        relations['mfrs_orig_from_city'] = adj_city
+        relations['Manufacturers from City'] = adj_city
     else:
-        relations['mfrs_orig_from_city'] = []
+        relations['Manufacturers from City'] = []
 
     # Other manufacturers in the state
     if state_rev.get(state) is not None:
@@ -545,9 +545,9 @@ def get_related_edge(ctry, city, state, mfr_, make, type_):
             if edge[1] == int(state_):
                 adj_state.append(mfrs[mfr_codes[str(edge[0])]]['name'])
 
-        relations['mfrs_orig_from_state'] = adj_state
+        relations['Manufacturers from State'] = adj_state
     else:
-        relations['mfrs_orig_from_state'] = []
+        relations['Manufacturers from State'] = []
 
     # Other manufacturers in the postal
     if get_postal_by_mfr(mfr_) is not None:
@@ -559,9 +559,9 @@ def get_related_edge(ctry, city, state, mfr_, make, type_):
                 if 31258 <= edge[0] <= 50257:
                     adj_postal.append(mfrs[mfr_codes[str(edge[0])]]['name'])
 
-        relations['mfrs_orig_from_postal'] = adj_postal
+        relations['Manufacturers from Zip Code'] = adj_postal
     else:
-        relations['mfrs_orig_from_postal'] = []
+        relations['Manufacturers from Zip Code'] = []
 
     # Leader
     if get_leader_by_mfr(mfr_) is not None:
@@ -573,9 +573,9 @@ def get_related_edge(ctry, city, state, mfr_, make, type_):
                     l = leader_codes[str(edge[1])]
                     leader = leaders[l]
 
-        relations['leader'] = [leader['name'], leader['pos']]
+        relations['Leaders'] = [leader['name'], leader['pos']]
     else:
-        relations['leader'] = []
+        relations['Leaders'] = []
 
     # Link to Vin Decoder
     if mfr_name.get(mfr_):
@@ -586,9 +586,9 @@ def get_related_edge(ctry, city, state, mfr_, make, type_):
                 if 85523 <= edge[1] <= 93961:
                     link = links[str(link_codes[str(edge[1])])]["URL"]
 
-        relations['link'] = [link]
+        relations['Website'] = [link]
     else:
-        relations['link'] = []
+        relations['Website'] = []
 
     # Manufacturers that share the common name
     if mfr_name.get(mfr_) is not None:
@@ -601,9 +601,9 @@ def get_related_edge(ctry, city, state, mfr_, make, type_):
             if edge[0] == int(ccode):
                 mans.append(mfrs[mfr_codes[str(edge[1])]]['name'])
 
-        relations['same_common_name'] = mans
+        relations['Same Name'] = mans
     else:
-        relations['same_common_name'] = []
+        relations['Same Name'] = []
 
 
     # Other makes made by the manufacturer (Sibling makes)
@@ -618,9 +618,9 @@ def get_related_edge(ctry, city, state, mfr_, make, type_):
                 if 50258 <= edge[1] <= 60400 and edge[1] != int(mcode):
                     sis.append(makes[str(make_codes[str(edge[1])])])
 
-        relations['sister_makes'] = sis
+        relations['Sister Makes'] = sis
     else:
-        relations['sister_makes'] = []
+        relations['Sister Makes'] = []
 
     # Types made by make
     if make_name.get(make) is not None:
@@ -633,9 +633,9 @@ def get_related_edge(ctry, city, state, mfr_, make, type_):
                 if 93961 <= edge[1] <= 93969:
                     mods.append(type_name_flipped[str(type_codes[str(edge[1])])])
 
-        relations['types'] = mods
+        relations['Types Produced'] = mods
     else:
-        relations['types'] = []
+        relations['Types Produced'] = []
 
 
     # Models made by the make
@@ -649,15 +649,15 @@ def get_related_edge(ctry, city, state, mfr_, make, type_):
                 if 60401 <= edge[1] <= 85522:
                     mods.append(models[model_codes[str(edge[1])]]['model'])
 
-        relations['models'] = mods
+        relations['Models'] = mods
     else:
-        relations['models'] = []
+        relations['Models'] = []
 
     end = time.time()
 
-    relations['elapsed_time'] = [f"{(end - start) * 1000} milliseconds"]
-    relations['leader'] = [relations['leader']]
-    relations['link'] = [relations['link']]
+    relations['Elapsed Time'] = [f"{(end - start) * 1000} milliseconds"]
+    relations['Leaders'] = [relations['Leaders']]
+    relations['Website'] = [relations['Website']]
 
     return relations
 
